@@ -4,6 +4,7 @@
 #
 # Uploads are only accepted if pkg.earendil.com allows this repository, this workflow on main, and every package it
 # publishes.
+# Forks cannot authenticate to the upstream package service, so both jobs are upstream-only.
 
 name: Preview packages
 
@@ -21,6 +22,7 @@ jobs:
     # Only CI runs for pushes to main and for PRs from branches of this repo. A branch can make its own copy of CI run
     # on push; such runs are not reviewed and must not be published as push builds.
     if: >-
+      github.repository == 'earendil-works/pi' &&
       github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'cancelled' &&
       github.event.workflow_run.head_repository.full_name == github.repository &&
       ((github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main') ||
@@ -95,6 +97,7 @@ jobs:
   cleanup:
     # Only PRs into main: pull_request_target runs this file from the PR's base branch, and only main is allowed.
     if: >-
+      github.repository == 'earendil-works/pi' &&
       github.event_name == 'pull_request_target' && github.event.pull_request.base.ref == github.event.repository.default_branch &&
       github.event.pull_request.head.repo.full_name == github.repository
     concurrency:
