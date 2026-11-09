@@ -16,11 +16,9 @@ on:
       - 'scripts/model-catalog-minimum-version.mjs'
       - 'scripts/model-catalog-protocol.ts'
       - 'scripts/publish-model-catalog.mjs'
-  # GitHub schedules use UTC. Run hourly candidates across the CET/CEST
-  # boundaries; the publish job only uploads at 10:17, 12:17, and 14:17
-  # Europe/Vienna time.
+  # Run weekly on Monday at 10:17 UTC (11:17 CET / 12:17 CEST).
   schedule:
-    - cron: '17 8-13 * * 1-5'
+    - cron: '17 10 * * 1'
   workflow_dispatch:
     inputs:
       source_ref:
@@ -135,12 +133,8 @@ jobs:
             allowed=true
             reason="manual publication"
           elif (( local_day <= 5 && local_hour >= 10 && local_hour < 15 )); then
-            if [[ "$EVENT_NAME" != "schedule" ]] || (( (local_hour - 10) % 2 == 0 )); then
-              allowed=true
-              reason="business-hours publication"
-            else
-              reason="not a scheduled 10:17, 12:17, or 14:17 Europe/Vienna publication"
-            fi
+            allowed=true
+            reason="business-hours publication"
           fi
 
           echo "allowed=$allowed" >> "$GITHUB_OUTPUT"
